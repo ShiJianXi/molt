@@ -19,7 +19,7 @@ jobs:
       - name: Only file types the plugin directory accepts
         run: |
           bad=0
-          for f in $(git ls-files); do
+          while IFS= read -r -d '' f; do
             case "$f" in
               *.png|*.jpg|*.jpeg|*.gif|*.webp|*.ico) continue ;;
               *.md|*.txt|*.json|*.yml|*.yaml|LICENSE|.gitignore) ;;
@@ -28,7 +28,7 @@ jobs:
             head -c2 "$f" | grep -q '^#!' && { echo "starts with #!: $f"; bad=1; }
             iconv -f utf-8 -t utf-8 "$f" > /dev/null 2>&1 || { echo "not UTF-8: $f"; bad=1; }
             tr -d '\000' < "$f" | cmp -s - "$f" || { echo "has NUL bytes: $f"; bad=1; }
-          done
+          done < <(git ls-files -z)
           exit $bad
       - name: The brief's plugin-loading block links skills once and never overwrites
         run: |
