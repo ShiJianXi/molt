@@ -19,8 +19,16 @@ to the orchestrator, never to the user.
 - Run it from a **cloud** session. It needs `create_session`, `get_session` and `send_message`
   (Claude Code Remote MCP; `ToolSearch` `create session` if they aren't loaded). Without them,
   tell the user to start the orchestrator on claude.ai/code, and stop.
-- `get_session` with no id returns this session's own id, title and `permission_mode`. Read them
-  before writing any brief.
+- `get_session` with no id returns this session's own id, title and `permission_mode`, and its
+  `session_context.model` and `session_context.effort_level`. Read them before writing any brief.
+- `create_session` takes a `model`. Whether it takes an effort level depends on the tool's
+  version: read its schema (`ToolSearch` `select:mcp__claude-code-remote__create_session`) and use
+  the parameter if one is there (`effort`, `effort_level` or similar). Without one, a cloud child
+  starts at its environment's default effort. Its effort can then change only on its session page,
+  or with `CLAUDE_CODE_EFFORT_LEVEL` (`low` to `max`) set on the environment it runs on, which
+  overrides effort for every session there. A brief can't change it: the child has no tool for its
+  own effort. Either way, `get_session` on the child shows the effort it got in
+  `session_context.effort_level`.
 - A cloud child starts from its prompt alone: it has none of this conversation. It can't be more
   permissive than this session. In `default` mode, every Edit or Bash call waits on a prompt nobody
   is watching. Never start a child in `plan` mode, for the same reason.
@@ -73,7 +81,11 @@ to the orchestrator, never to the user.
      files, desktop apps, local MCP servers).
 
    Put the recommended option first, with "(Recommended)" in its label. If the tasks differ, the
-   user can pick per task under "Other". For cloud children, if this session's `permission_mode`
+   user can pick per task under "Other".
+   **Model and effort.** Each child gets a model and an effort level. Use what the user named,
+   per task or for all; otherwise this session's own (`get_session`), and say so in the step 6
+   table. Don't ask just for this. A user can say "Sonnet at low for the docs task" at any point
+   before that child starts. For cloud children, if this session's `permission_mode`
    isn't `auto`, warn the user that the children can't be started in `auto` (they can't be more
    permissive than this session) and, in `default`, will stall on prompts, before going on.
 4. **Start the children.** Each one gets a new branch, never `main` or a branch another child uses.
@@ -96,12 +108,21 @@ to the orchestrator, never to the user.
      Done when instead of quietly skipping it.
    - Cloud: `create_session` per task with `title` = `<task> build`, `prompt` = the brief
      (step 5), `source_url` = the repository, `outcome_branch` = its branch, and
-     `extra_allowed_tools` = [`mcp__claude-code-remote__send_message`] and
-     `permission_mode` = `auto`. Then `get_session` the child: if its `permission_mode` isn't
-     `auto` (or the call was refused), tell the user which child runs in which mode, since only
-     they can switch it from the session's page. A child that needs more repositories attaches
+     `extra_allowed_tools` = [`mcp__claude-code-remote__send_message`],
+     `permission_mode` = `auto`, `model` = the child's model (step 3), and its effort level if
+     `create_session` has a parameter for it (**Facts**). Then `get_session` the child: if its
+     `permission_mode` isn't `auto` (or the call was refused), tell the user which child runs in
+     which mode, since only they can switch it from the session's page. Do the same for
+     `session_context.model` and `session_context.effort_level`: when either isn't what step 3
+     chose, tell the user which child got what, and that they can change it on the child's
+     session page, or set `CLAUDE_CODE_EFFORT_LEVEL` on the environment the children run on (it
+     applies to every session there, this one too if it shares it). Set that variable only
+     when the user asks. A child that needs more repositories attaches
      them itself with `add_repo`; say which ones in its brief.
-   - Local: for each task, follow the cloud-local-bridge skill's **Sender** steps 1–4, with one
+   - Local: pass the model and effort when you start it: `claude --model <model> --effort
+     <level>` for a terminal session you start from here. If you can't (the user opens it, or
+     Desktop starts it), tell the user which model and effort to pick there.
+     For each task, follow the cloud-local-bridge skill's **Sender** steps 1–4, with one
      git worktree per child: `claude remote-control --spawn worktree`, a Desktop worktree session,
      or `git worktree add`. Never put two children in the same checkout. The user picks the
      approach there (start it from here on a bridge environment, or open it themselves); ask once
@@ -154,7 +175,8 @@ to the orchestrator, never to the user.
    the orchestrator`. Never put the wiki's link in a brief.
 
 6. **Tell the user** what is running: a table of task, session title, `session_…` id (cloud) or
-   `ListAgents` row (local), and branch. Add what each child will report and what still needs the
+   `ListAgents` row (local), branch, and model and effort (as `get_session` reports them for a
+   cloud child). Add what each child will report and what still needs the
    user (approvals, reviewers, merge order). Ask them not to archive this session until step 9.
    The table is how you reach the children again, so keep it current.
 7. **Relay and direct.** Match each incoming message's sender against the table. For each child

@@ -105,6 +105,11 @@ git worktree and can use your browser.
   your yes, so the orchestrator asks once before it starts the children. A plugin step that must happen (say,
   a script whose output goes in the PR) goes in the child's "done when", and the orchestrator
   checks it before calling the task done.
+- Each child runs on a model and effort level you can pick per task, e.g. "Sonnet at low for the
+  docs task". Otherwise it uses the orchestrator's own. The orchestrator passes the model when it
+  starts a cloud child, and the effort too when the session tool offers it. If a child comes up at
+  a different effort, it tells you which one, and you change it on that child's session page or
+  set `CLAUDE_CODE_EFFORT_LEVEL` on the cloud environment the children run on.
 - Don't use bypass-permissions mode for the local session. It holds messages from the cloud, and
   Desktop drops them after 5 minutes.
 - An orchestrator with a wiki writes to it only when a fact would otherwise be lost. Only that
@@ -162,6 +167,12 @@ Sessions you start from the app get your claude.ai plugins. A session another se
 come up with only the built-in ones, and nothing when starting it turns that on. The orchestrator
 tells each child which plugins it uses and where they live, and the child loads their skills
 itself.
+
+**Can I choose the model and effort for each child session?**
+Yes. Say which model and effort each task should use, or one for all. The orchestrator starts each
+child with that model, checks what model and effort it actually got, and lists both in its table of
+running sessions. When the tool that starts cloud sessions has no effort setting, the child gets
+its environment's default, and the orchestrator tells you how to change it.
 
 **Does it collect any data?**
 No. It has no servers, no hooks and no scripts that make network calls. See the [privacy policy](PRIVACY.md).
