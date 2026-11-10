@@ -117,6 +117,10 @@ git worktree and can use your browser.
   orchestrator" and it reads the wiki before anything else. Prefer `/compact`: the orchestrator restates its role
   after each wiki write, so an automatic compaction usually keeps it working from the wiki. Molt ships no hooks, so nothing runs
   on its own when a session starts.
+- Molt is only Markdown instructions: no scripts, no HTML files. When it makes a plan board or a
+  wiki, Claude writes the page from a spec in the skill (`board-page.md`, `wiki-page.md`), so two
+  boards can differ a little in looks. The data they show is the same. Boards and wikis made
+  before 2.6.0 keep their page and work as before.
 - The wiki page shows what needs you first, then a card for each piece of work, then the
   decisions and gotchas. Ids and tool names are kept in a "Technical details" fold. A wiki made
   before 2.1.0 switches to this layout the next time it's resumed or written to.
@@ -175,7 +179,7 @@ running sessions. When the tool that starts cloud sessions has no effort setting
 its environment's default, and the orchestrator tells you how to change it.
 
 **Does it collect any data?**
-No. It has no servers, no hooks and no scripts that make network calls. See the [privacy policy](PRIVACY.md).
+No. It has no servers, no hooks and no scripts. See the [privacy policy](PRIVACY.md).
 
 **Is it free?**
 Yes. Free and open source.
@@ -186,14 +190,18 @@ Run these from the plugin root after changing a skill:
 
 - `claude plugin eval . --tag artifact-plan`: three cases in `evals/artifact-plan/`.
 - `claude plugin eval . --tag orchestrator-wiki`: nine cases in `evals/orchestrator-wiki/`.
-- `node skills/orchestrator-wiki/test_wiki_page.mjs`: checks the wiki page shows learned rules, the
-  last review and the archive.
-- `python3 skills/artifact-plan/scripts/validate_plan.py --selftest`: checks the plan validator.
-- `sh skills/orchestrate/test_plugin_block.sh`: checks the brief's plugin-loading block.
+CI (`.github/workflows/check.yml`) runs `claude plugin validate .`, a check that skill frontmatter
+has no `<` or `>` (claude.ai strips them from descriptions), a check that every plugin file is an
+allowed type, and a run of the brief's plugin-loading block, on every pull request. The evals call
+the model, so CI leaves them out. Run them by hand before a release.
 
-CI (`.github/workflows/check.yml`) runs `claude plugin validate .`, the last three checks and a check that skill frontmatter has no `<` or `>` (claude.ai strips them from descriptions) on every pull request. The evals call the model, so CI leaves them out. Run them by hand before a release.
+The plugin directory accepts only Markdown, text, JSON, YAML and PNG, JPEG, GIF, WebP or ICO images
+from plugins outside a Verified organization, with no file starting with `#!`. Keep scripts,
+HTML and test programs out of the repository; a check that needs code goes inline in
+`check.yml`.
 
-When a review finding is accepted, fix it with a check that fails before the fix and passes after it. Add that check to one of the scripts above, so CI keeps the bug from coming back.
+When a review finding is accepted, fix it with a check that fails before the fix and passes after
+it. Add that check to `check.yml`, so CI keeps the bug from coming back.
 
 ## Website
 

@@ -18,8 +18,8 @@ the orchestrator would otherwise lose on `/compact` or `/clear`, and nothing els
 stays small: what falls off the pages goes to an archive inside the same wiki (step 8), and the
 orchestrator reviews its own friction now and then to tidy up and learn rules (step 9).
 
-The page is `wiki.html` in this skill's directory; the data lives in the artifact's database, so
-writes are database writes, never republishes. The plugin ships no hooks, so nothing reloads the
+The page is written from `wiki-page.md` in this skill's directory; the data lives in the
+artifact's database, so writes are database writes, never republishes. The plugin ships no hooks, so nothing reloads the
 wiki for you: after `/compact` or `/clear` the user says "resume my <domain> orchestrator" (or a
 compacted summary names the wiki) and step 4 runs.
 
@@ -73,8 +73,8 @@ If the Artifact tool or `ArtifactData` isn't available, say so in one line and g
 
 ## 2. Create
 
-1. Copy `wiki.html` to the scratchpad as `wiki-<domain slug>.html` and publish it with the
-   Artifact tool: `icon` = `book`, `capabilities` = `{"db": {"rules": [{"path": "wiki", "read":
+1. Read `wiki-page.md` in this skill's directory, write the page it describes to the scratchpad
+   as `wiki-<domain slug>.html`, and publish it with the Artifact tool: `icon` = `book`, `capabilities` = `{"db": {"rules": [{"path": "wiki", "read":
    "owner", "write": "owner"}, {"path": "pages", "read": "owner", "write": "owner"}, {"path":
    "log", "read": "owner", "write": "owner"}]}}`.
 2. Seed it with one `ArtifactData` `batch`:
@@ -138,11 +138,12 @@ wrong, `topic` two or three words you'll reuse for the same kind of trouble ("lo
 
 **Upgrading an older wiki.** Check `meta.format` the first time you resume or write:
 
-- No `format` (pages hold a free-text `body`): republish this skill's `wiki.html` to the wiki's
-  URL (Artifact `read` it first; leave `capabilities` out so they carry over), then in one batch
+- No `format` (pages hold a free-text `body`): write a fresh page from `wiki-page.md`
+  and republish it to the wiki's URL (Artifact `read` it first; leave `capabilities` out so they
+  carry over), then in one batch
   rewrite the four pages into the shapes above, drop `body`, set `meta.format` to `3`, and log
   "Moved the wiki to the readable layout." The new page shows an old `body` as is until then.
-- `format: 2`: republish `wiki.html` the same way, then in one batch set `meta.format` to `3`,
+- `format: 2`: write and republish the page from `wiki-page.md` the same way, then in one batch set `meta.format` to `3`,
   `meta.lastReviewAt` to now, and `meta.logSeq` and `meta.lastReviewLog` to the latest `n` (one
   `list` of `log`), and log "Turned on the archive and reviews." Existing items get no dates;
   treat a missing date as the upgrade day.

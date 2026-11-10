@@ -12,7 +12,8 @@ Claude desktop app or the terminal.
 
 1. Fork the repo and make a branch.
 2. Edit the skill under `skills/`. Keep `SKILL.md` frontmatter free of `<` and `>`, because
-   claude.ai strips them from descriptions.
+   claude.ai strips them from descriptions. Add only Markdown, text, JSON, YAML or image files:
+   the plugin directory refuses scripts, HTML and other programs from unverified publishers.
 3. Run the checks in [Development](README.md#development). CI runs the same ones on your pull
    request, except the evals, which call the model.
 4. If you fix a bug, add a check that fails before the fix and passes after it.

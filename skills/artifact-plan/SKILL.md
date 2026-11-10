@@ -14,8 +14,8 @@ description: >
 
 One **plan board** per large task. The orchestrator (the session the user talks to) creates it, is
 the **only writer**, and updates it as implementation agents report. Agents never touch it.
-The page is `tracker.html` in this skill's directory; the data lives in the board's database, so
-updates are database writes, never republishes. `scripts/validate_plan.py` checks the task graph.
+The page is written from `board-page.md` in this skill's directory; the data lives in the board's
+database, so updates are database writes, never republishes.
 
 ## 1. Detect
 
@@ -60,16 +60,22 @@ Rules: no cycles. Two tasks that touch the same files are either one task or cha
 every blocker is `done`) and draws the waves from `blockedBy`. Clicking a task, in the list or the
 graph, expands it to show every field plus its blockers' and dependents' statuses.
 
-Write the tasks to a JSON list and run `python3 <skill dir>/scripts/validate_plan.py tasks.json`.
-Fix every problem it prints (cycles, unknown or duplicate ids, missing `title` or `doneWhen`)
-before going on. Then show the user the list (id, title, blocked by) and confirm the split, as
+Check the list before going on, and fix every problem you find:
+
+- every task has an `id`, and no two share one;
+- every task has a non-empty `title` and `doneWhen`;
+- `status`, when set, is one of the five above;
+- every `blockedBy` id is another task in the list, never the task itself;
+- no cycles: walk each task's blockers, their blockers and so on; reaching the task you started
+  from is a cycle. Name it ("T2 -> T4 -> T2") and break it.
+ Then show the user the list (id, title, blocked by) and confirm the split, as
 orchestrate step 1 does.
 
 ## 4. Publish and seed
 
-1. Publish `tracker.html` from this skill's directory with the Artifact tool, a new file path per
-   plan (copy it to the scratchpad as `plan-<slug>.html`), `icon` = `checklist`, and
-   `capabilities` = `{"db": {"rules": [{"path": "plan", "read": "view", "write": "owner"},
+1. Read `board-page.md` in this skill's directory and write the page it describes to the
+   scratchpad as `plan-<slug>.html`, a new file path per plan. Publish it with the Artifact
+   tool, `icon` = `checklist`, and `capabilities` = `{"db": {"rules": [{"path": "plan", "read": "view", "write": "owner"},
    {"path": "tasks", "read": "view", "write": "owner"}, {"path": "log", "read": "view",
    "write": "owner"}]}}`. Only the owner writes; anyone it's shared with can only read.
 2. Seed it with one `ArtifactData` `batch`:
@@ -145,7 +151,7 @@ Every write also sets `updatedAt` and adds a `log/e<n>` entry, one sentence. Aft
 `done`, find the tasks it unblocked (every blocker now `done`), start them within the cap
 (step 5), and say so in the same log entry: "T1 done. T3 and T4 are unblocked; started both."
 
-If the plan changes (a task splits, a new dependency shows up), rerun the validator on the new
+If the plan changes (a task splits, a new dependency shows up), rerun the step 3 checks on the new
 list, then update `tasks` and `blockedBy` in one batch and log why. Delete a task only on the
 user's word.
 
