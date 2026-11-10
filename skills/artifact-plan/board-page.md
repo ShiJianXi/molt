@@ -42,7 +42,7 @@ Title `Plan Board`. One column, max width about 1080px, 16px side gutters, four 
    an SVG `<title>`). Curved arrows run from each blocker to its dependent: solid while the
    blocker isn't done, dashed and faint once it is. A legend of status pills sits under it.
 3. **Tasks.** A list grouped under wave headings ("Wave 1 · can start now", "Wave 2 · after wave
-   1"), sorted by wave, `order`, id. Each task is a `<details>` row: id, title, status pill, and a
+   1"), sorted by wave, `order`, id. Each task is a `<details>` row: a `›` chevron that turns down when open, id, title, status pill, and a
    hint line ("Waiting on T1, T2" for open blockers, else "Agent: <owner>"). Expanded, it shows
    `details` as a paragraph, then a definition list of Done when, Wave, Blocked by and Unblocks
    (each linked task as id, title and its status pill; "Nothing, can start any time" and "Nothing"
