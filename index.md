@@ -31,7 +31,7 @@ Or in a local Claude Code session: `/plugin install molt --marketplace ShiJianXi
 
 **How do I let Claude Code on the web do something that needs my computer?** Ask it to hand that step to your computer. A local Claude session (Claude Desktop, or `claude remote-control`) does it and sends the result back.
 
-**Does it collect data?** No. No servers, no hooks, no network calls.
+**Does it collect data?** No. No servers, no hooks, no scripts, no network calls. It's only Markdown instructions; Claude writes the plan board and wiki pages from specs in the skills.
 
 **Can I choose the model and effort for each child session?** Yes. Say which model and effort each task should use, or one for all; otherwise children use the orchestrator's own. The orchestrator starts each child with that model, checks what model and effort it actually got, and lists both in its table of running sessions. When the tool that starts cloud sessions has no effort setting, the child gets its environment's default, and the orchestrator tells you to change it on the child's session page or set `CLAUDE_CODE_EFFORT_LEVEL` on the children's environment.
 
