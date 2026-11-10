@@ -1,6 +1,6 @@
 # Privacy policy
 
-Molt is a set of instruction files (`skills/`) for Claude Code, with small local check scripts.
+Molt is a set of Markdown instruction files (`skills/`) for Claude Code. It ships no scripts or programs.
 It has no servers, no hooks, no MCP servers and no network calls of its own. It reads no
 credentials.
 

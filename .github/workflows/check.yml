@@ -16,6 +16,33 @@ jobs:
       - name: No angle brackets in skill frontmatter (claude.ai strips them from descriptions)
         run: |
           awk 'FNR==1{n=0} /^---$/{n++; next} {l=$0; sub(/:[ ]*[>|][-+0-9]*[ ]*(#.*)?$/, "", l)} n==1 && l ~ /[<>]/ {print FILENAME": "$0; bad=1} END{exit bad}' skills/*/SKILL.md
-      - run: node skills/orchestrator-wiki/test_wiki_page.mjs
-      - run: python3 skills/artifact-plan/scripts/validate_plan.py --selftest
-      - run: sh skills/orchestrate/test_plugin_block.sh
+      - name: Only file types the plugin directory accepts
+        run: |
+          bad=0
+          while IFS= read -r -d '' f; do
+            case "$f" in
+              *.png|*.jpg|*.jpeg|*.gif|*.webp|*.ico) continue ;;
+              *.md|*.txt|*.json|*.yml|*.yaml|LICENSE|.gitignore) ;;
+              *) echo "not an allowed type: $f"; bad=1; continue ;;
+            esac
+            head -c2 "$f" | grep -q '^#!' && { echo "starts with #!: $f"; bad=1; }
+            iconv -f utf-8 -t utf-8 "$f" > /dev/null 2>&1 || { echo "not UTF-8: $f"; bad=1; }
+            tr -d '\000' < "$f" | cmp -s - "$f" || { echo "has NUL bytes: $f"; bad=1; }
+          done < <(git ls-files -z)
+          exit $bad
+      - name: The brief's plugin-loading block links skills once and never overwrites
+        run: |
+          set -e
+          repo=$PWD; tmp=$(mktemp -d)
+          sed -n '/^   ```sh$/,/^   ```$/p' skills/orchestrate/SKILL.md | sed '1d;$d;s/^   //' > "$tmp/block.sh"
+          HOME="$tmp" p=molt r="$repo" sh "$tmp/block.sh" > /dev/null
+          for s in artifact-plan cloud-local-bridge orchestrate orchestrator-wiki; do
+            [ -f "$tmp/.claude/skills/$s/SKILL.md" ] || { echo "FAIL: $s not linked"; exit 1; }
+          done
+          mkdir -p "$tmp/.claude/plugins/synced/x/molt"; rm -rf "$tmp/.claude/skills"
+          HOME="$tmp" p=molt r="$repo" sh "$tmp/block.sh" > /dev/null
+          [ ! -e "$tmp/.claude/skills" ] || { echo "FAIL: linked a plugin that was already synced"; exit 1; }
+          rm -rf "$tmp/.claude/plugins/synced/x/molt"; mkdir -p "$tmp/.claude/skills/orchestrate"
+          HOME="$tmp" p=molt r="$repo" sh "$tmp/block.sh" | grep -q "skipped.*orchestrate" || { echo "FAIL: overwrote another skill"; exit 1; }
+          [ ! -L "$tmp/.claude/skills/orchestrate" ] || { echo "FAIL: replaced another skill"; exit 1; }
+          echo "plugin block OK"
