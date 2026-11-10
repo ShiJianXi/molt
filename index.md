@@ -33,6 +33,8 @@ Or in a local Claude Code session: `/plugin install molt --marketplace ShiJianXi
 
 **Does it collect data?** No. No servers, no hooks, no network calls.
 
+**Can I choose the model and effort for each child session?** Yes. Say which model and effort each task should use, or one for all; otherwise children use the orchestrator's own. The orchestrator starts each child with that model, checks what model and effort it actually got, and lists both in its table of running sessions. When the tool that starts cloud sessions has no effort setting, the child gets its environment's default, and the orchestrator tells you to change it on the child's session page or set `CLAUDE_CODE_EFFORT_LEVEL` on the children's environment.
+
 **Is it free?** Yes. Free and open source, MIT license.
 
 Source: https://github.com/ShiJianXi/molt

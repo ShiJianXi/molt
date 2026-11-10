@@ -16,9 +16,10 @@ A Claude Code orchestrator is one session that plans the work and hands each tas
 1. **Install Molt.** On claude.ai, open [Customize → Plugins](https://claude.ai/customize/plugins), find Molt under Discover and choose Add. Start a new session on [claude.ai/code](https://claude.ai/code): the orchestrator runs in a cloud session.
 2. **Ask for orchestration.** Say "orchestrate these tasks, one session each" and list them.
 3. **Pick where they run.** The orchestrator asks whether to run them in the cloud or on your computer, and warns you when two tasks touch the same files.
-4. **Answer in one place.** Each task runs in its own session and branch. Their questions come to you through the orchestrator.
-5. **Track the board.** For work with dependencies, say "plan this and track it on a board" to get a live plan board.
-6. **Review and merge.** When a pull request is ready, the orchestrator checks it, tells you, and asks whether to archive that session.
+4. **Pick model and effort, if you want.** Say "Sonnet at low for the docs task" or one choice for all. Otherwise each child uses the orchestrator's own model and effort, and the orchestrator tells you if a child came up at a different one.
+5. **Answer in one place.** Each task runs in its own session and branch. Their questions come to you through the orchestrator.
+6. **Track the board.** For work with dependencies, say "plan this and track it on a board" to get a live plan board.
+7. **Review and merge.** When a pull request is ready, the orchestrator checks it, tells you, and asks whether to archive that session.
 
 Run the orchestrator from a cloud session in **auto** mode, or the child sessions stall waiting for approvals.
 
@@ -26,6 +27,7 @@ Run the orchestrator from a cloud session in **auto** mode, or the child session
 
 ```
 Orchestrate these three tasks, one session each.
+Run the docs task on Sonnet at low effort.
 Plan this and track it on a board.
 Own billing from now on and keep a wiki.
 Resume my billing orchestrator.
@@ -53,6 +55,8 @@ The wiki doesn't grow forever. Old items move to a monthly archive, and about on
 **What are Claude Code orchestration skills?** Skills that teach Claude Code to coordinate several sessions: split the work, start a session per task, relay questions, track progress and check results. Molt ships three: orchestrate, artifact-plan and orchestrator-wiki.
 
 **Does it work with Claude Code on the web?** Yes, that's where the orchestrator runs. Its tasks run in cloud sessions, or on your computer through Remote Control.
+
+**Can I choose the model and effort for each child session?** Yes. Say which model and effort each task should use, or one for all; otherwise children use the orchestrator's own. The orchestrator starts each child with that model, checks what model and effort it actually got, and lists both in its table of running sessions. When the tool that starts cloud sessions has no effort setting, the child gets its environment's default, and the orchestrator tells you to change it on the child's session page or set `CLAUDE_CODE_EFFORT_LEVEL` on the children's environment.
 
 **Is it free?** Yes. Free and open source under the MIT license. No servers and no data collected.
 

@@ -33,7 +33,7 @@
       "description": "Claude Code orchestration skills: one session orchestrates related tasks in parallel sessions, tracks them on a live plan board, and keeps a private wiki so it can be compacted or cleared safely and run for weeks. The kit follows how its author works with Claude and where the community is heading. It also hands browser, OAuth sign-in, desktop-app and local-file steps from a Claude Code on the web (claude.ai/code) session to a local Claude Desktop or Remote Control session, and returns the result. Also runs related tasks in parallel sessions, tracks them on a live plan board, and keeps a private wiki for long-running orchestrators so their context can be compacted or cleared safely. The wiki archives old items instead of growing, and the orchestrator reviews its own friction to tidy up and learn rules.",
       "url": "https://shijianxi.github.io/molt/",
       "downloadUrl": "https://github.com/ShiJianXi/molt",
-      "softwareVersion": "2.4.2",
+      "softwareVersion": "2.5.0",
       "keywords": "Claude Code orchestrator, Claude Code orchestration skills, multi-agent, parallel sessions, agent orchestration, Claude Code plugin, Claude Code skills, plan board, orchestrator wiki",
       "featureList": ["Orchestrate related tasks in parallel Claude Code sessions", "Live plan board with task order and blockers", "Private wiki that lets a long-running orchestrator survive /compact and /clear", "Self-review that archives old items and learns rules", "Hand browser, OAuth sign-in, desktop-app and local-file steps from cloud sessions to your computer"],
       "license": "https://opensource.org/licenses/MIT",
@@ -67,6 +67,8 @@
           "acceptedAnswer": { "@type": "Answer", "text": "No. The pages read on every resume stay capped. Old items move to a monthly archive in the same private wiki, and about once a week the orchestrator reviews its own friction: it tidies up and adds its own learned rules, and asks you before changing your rules or the scope. The review never runs in another session or on a schedule." } },
         { "@type": "Question", "name": "Why doesn't a session started by another session have my plugins?",
           "acceptedAnswer": { "@type": "Answer", "text": "Sessions you start from the app get your claude.ai plugins. A session another session starts can come up with only the built-in ones. The orchestrator tells each child which plugins it uses and where they live, and the child loads their skills itself. Hooks and MCP servers don't come across. A plugin step that must happen goes in the child's done-when, and the orchestrator checks it before calling the task done. Attaching a plugin's repository needs your yes, so the orchestrator asks once before it starts the children." } },
+        { "@type": "Question", "name": "Can I choose the model and effort for each child session?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Say which model and effort each task should use, or one for all; otherwise children use the orchestrator's own. The orchestrator starts each child with that model, checks what model and effort it actually got, and lists both in its table of running sessions. When the tool that starts cloud sessions has no effort setting, the child gets its environment's default, and the orchestrator tells you to change it on the child's session page or set CLAUDE_CODE_EFFORT_LEVEL on the children's environment." } },
         { "@type": "Question", "name": "Is it free?",
           "acceptedAnswer": { "@type": "Answer", "text": "Yes. It is free and open source under the MIT license." } }
       ]
@@ -327,6 +329,10 @@
       <details>
         <summary>Why doesn't a session started by another session have my plugins?</summary>
         <p>Sessions you start from the app get your claude.ai plugins. A session another session starts can come up with only the built-in ones. The orchestrator tells each child which plugins it uses and where they live, and the child loads their skills itself. Hooks and MCP servers don't come across. A plugin step that must happen goes in the child's done-when, and the orchestrator checks it before calling the task done. Attaching a plugin's repository needs your yes, so the orchestrator asks once before it starts the children.</p>
+      </details>
+      <details>
+        <summary>Can I choose the model and effort for each child session?</summary>
+        <p>Yes. Say which model and effort each task should use, or one for all; otherwise children use the orchestrator's own. The orchestrator starts each child with that model, checks what model and effort it actually got, and lists both in its table of running sessions. When the tool that starts cloud sessions has no effort setting, the child gets its environment's default, and the orchestrator tells you to change it on the child's session page or set <code>CLAUDE_CODE_EFFORT_LEVEL</code> on the children's environment.</p>
       </details>
       <details>
         <summary>Is it free?</summary>
