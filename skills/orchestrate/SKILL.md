@@ -75,8 +75,9 @@ to the orchestrator, never to the user.
    (task status changes, shared config) here, with the user's approval, before any child starts.
    This is the point of one orchestrator: the children shouldn't each rediscover it or race to
    make it. Anything a child needs from outside its own repository (a PR, an issue or a file in
-   another repository) you read here and paste into its brief: a child can't attach another
-   repository without the user's yes (step 4), and it can't ask the user.
+   another repository) you read here and paste into its brief, when it fits (the parts it needs,
+   not whole files). Anything too big to paste goes into step 4's question instead: a child
+   can't attach another repository without the user's yes, and it can't ask the user.
 3. **Ask where the children run**, with `AskUserQuestion`, unless the request already says:
    - **Cloud sessions**: recommended when the tasks need only the repository.
    - **Local sessions**: recommended when they need the user's machine (browser, sign-ins, local
