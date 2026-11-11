@@ -172,6 +172,13 @@ come up with only the built-in ones, and nothing when starting it turns that on.
 tells each child which plugins it uses and where they live, and the child loads their skills
 itself.
 
+**Why can't a child session open another repository?**
+A child can't attach a repository you haven't approved, and nobody is there to ask. Before it
+starts the children, the orchestrator reads what they need from other repositories (a PR, an issue
+or a file) and puts it in their briefs. If a child has to work in another repository, the
+orchestrator asks you once. If an attach is still refused, the child sends the orchestrator the
+exact error and it tells you.
+
 **Can I choose the model and effort for each child session?**
 Yes. Say which model and effort each task should use, or one for all. The orchestrator starts each
 child with that model, checks what model and effort it actually got, and lists both in its table of

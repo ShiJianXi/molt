@@ -74,7 +74,9 @@ to the orchestrator, never to the user.
 2. **Do the shared work once, here.** Read what all the tasks need, and make the shared writes
    (task status changes, shared config) here, with the user's approval, before any child starts.
    This is the point of one orchestrator: the children shouldn't each rediscover it or race to
-   make it.
+   make it. Anything a child needs from outside its own repository (a PR, an issue or a file in
+   another repository) you read here and paste into its brief: a child can't attach another
+   repository without the user's yes (step 4), and it can't ask the user.
 3. **Ask where the children run**, with `AskUserQuestion`, unless the request already says:
    - **Cloud sessions**: recommended when the tasks need only the repository.
    - **Local sessions**: recommended when they need the user's machine (browser, sign-ins, local
@@ -97,11 +99,15 @@ to the orchestrator, never to the user.
      leave it out and say so.
      Attaching a plugin's repository with `add_repo` widens what the child can reach, and the
      child's auto-mode check blocks it unless the user approved it: a brief alone isn't the
-     user's approval. So ask the user once, with `AskUserQuestion`, for all the children:
-     "Let the children attach <owner/repo, ...> to load those plugins?" On a yes, each brief's
-     `Allowed` line names only the repositories in that child's own `Plugins` line. On a no,
-     leave those plugins out of `Plugins` and their steps out of `Done when`, and tell the user
-     which plugin steps the children won't do before starting them.
+     user's approval. The same goes for any other repository a child must work in (push to, or
+     read more than you can paste in step 2). So ask the user once, with `AskUserQuestion`, for
+     all the children: "Let the children attach <owner/repo, ...> (<which child, and why: its
+     plugins or its task>)?" On a yes, each brief's `Allowed` line names only the repositories
+     that child needs. On a no to a plugin repository, leave those plugins out of `Plugins`
+     and their steps out of `Done when`, and tell the user which plugin steps the children
+     won't do before starting them. On a no to a task
+     repository, paste what the child needs from it into the brief, or fold that work into a
+     child whose own repository it is.
      Any plugin step the task must not skip (a script whose output goes in the PR, a required
      check) goes into that child's `Done when` as an observable result, e.g. "PR's Cost section
      filled from the plugin's cost script". Then a child that couldn't load the plugin fails
@@ -117,8 +123,8 @@ to the orchestrator, never to the user.
      chose, tell the user which child got what, and that they can change it on the child's
      session page, or set `CLAUDE_CODE_EFFORT_LEVEL` on the environment the children run on (it
      applies to every session there, this one too if it shares it). Set that variable only
-     when the user asks. A child that needs more repositories attaches
-     them itself with `add_repo`; say which ones in its brief.
+     when the user asks. A child attaches any other repository itself with `add_repo`, and only
+     one its `Allowed` line names.
    - Local: pass the model and effort when you start it: `claude --model <model> --effort
      <level>` for a terminal session you start from here. If you can't (the user opens it, or
      Desktop starts it), tell the user which model and effort to pick there.
@@ -137,7 +143,8 @@ to the orchestrator, never to the user.
    Branch: <branch>
    Done when: <observable result, e.g. PR open and CI green>
    Allowed: <every write the user approved for this task>. <If the user approved it in step 4:
-     "The user approved attaching <owner/repo, ...> with add_repo, only to load their plugins.">
+     "The user approved attaching <owner/repo, ...> with add_repo, only to <load their plugins /
+     do this task>.">
      Never merge, approve, start other sessions, or touch a sibling's branch or item.
    Already done by the orchestrator: <shared work from step 2, facts found, decisions made>
    Siblings touch: <files or areas other tasks change; stay out of them or say why you can't>
@@ -147,8 +154,9 @@ to the orchestrator, never to the user.
      load after your next tool call, without the "<name>:" prefix; where a skill says
      ${CLAUDE_PLUGIN_ROOT}, use the plugin folder the block prints. Never write "not reported"
      or skip a step because a plugin wasn't loaded; if it still can't be, or the block printed
-     "skipped", say so in your report. If add_repo is refused, don't retry it or find another way
-     in: send the orchestrator the refusal at once, then carry on with what doesn't need it.
+     "skipped", say so in your report.
+   If add_repo is refused for any repository, don't retry it or find another way in: send the
+     orchestrator the refusal's exact text at once, then carry on with what doesn't need it.
    Reply: send_message to <your session_… id>, never to the user. Send when: <milestones, e.g. PR
      open, CI green>, and when blocked on a decision. First line: one sentence with the outcome or
      the question.
@@ -182,8 +190,10 @@ to the orchestrator, never to the user.
 7. **Relay and direct.** Match each incoming message's sender against the table. For each child
    message:
    - Milestone: pass it to the user in one line.
-   - Plugin attach refused: tell the user which child and repository. They can allow it on that
-     child's session page, or say the step can be skipped.
+   - Attach refused: tell the user which child and repository, and the refusal's text. A policy
+     or GitHub access error means the user (or an org owner) must grant access first; otherwise
+     they can allow it on that child's session page. If the child only needed to read something,
+     read it here and send it the content instead.
    - Done (its `Done when` is met): check each plugin step in `Done when` yourself (read the PR
      or its output). If one is missing or says "not reported", send the child back to do it. Then pass the outcome on, then ask the user with `AskUserQuestion`
      whether to archive that child's session. Options: **Keep it** (first; an archived child stops
