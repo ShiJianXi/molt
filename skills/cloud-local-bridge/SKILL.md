@@ -103,6 +103,9 @@ received a `<cross-session-message from-session="session_…">` is the **receive
    Allowed: <read-only | the writes the user approved>
    ```
 
+   Never put a credential in a brief: no token, password, API key, cookie or sign-in code. The
+   local session signs in itself, on the user's machine.
+
    If you do not know your own title, say so in that line; the receiver then matches the topic.
 5. Tell the user what the local session will need from them (sign-ins, `/mcp`, approvals), and
    that the result arrives in this transcript as a new message.
@@ -118,7 +121,8 @@ received a `<cross-session-message from-session="session_…">` is the **receive
    same way.
 3. **Send** with `SendMessage` (`to` = that name; add ` [ref]` only if two rows share it). First
    line: one self-contained sentence with the outcome. Send the full report text; `@file` attaches
-   nothing on the other side.
+   nothing on the other side. A sign-in stays on this machine: report that it worked, never the
+   token, password, cookie or code it produced.
 4. If every route fails, `SendUserFile` the report and give the user the exact cloud title to paste
    it into. Tell the user the send is unconfirmed and where to look: the cloud session on
    claude.ai/code.

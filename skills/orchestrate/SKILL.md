@@ -161,6 +161,7 @@ to the orchestrator, never to the user.
    Reply: send_message to <your session_… id>, never to the user. Send when: <milestones, e.g. PR
      open, CI green>, and when blocked on a decision. First line: one sentence with the outcome or
      the question.
+     Never put a token, password, API key, cookie or sign-in code in a report.
      If send_message is refused, call confirm_repository_trust with the refusal's content_digest
      and retry once. If it is still refused, end your turn with the full report as your last
      message.
@@ -179,6 +180,8 @@ to the orchestrator, never to the user.
        else ln -sfn "${s%/}" "$d"; fi; done
    }
    ```
+
+   Never put a credential (token, password, API key, cookie, sign-in code) in a brief.
 
    If this session keeps an orchestrator wiki, copy the facts a child needs into `Already done by
    the orchestrator`. Never put the wiki's link in a brief.

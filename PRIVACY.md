@@ -2,7 +2,8 @@
 
 Molt is a set of Markdown instruction files (`skills/`) for Claude Code. It ships no scripts or programs.
 It has no servers, no hooks, no MCP servers and no network calls of its own. It reads no
-credentials.
+credentials, and it tells Claude never to put a token, password, API key, cookie or sign-in
+code in a message between sessions: a sign-in done on your computer stays there.
 
 - **Collects:** nothing. The plugin's author receives no data from it.
 - **Stores:** only in your own claude.ai account. The plan boards and wikis are private
