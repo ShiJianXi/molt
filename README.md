@@ -186,7 +186,8 @@ running sessions. When the tool that starts cloud sessions has no effort setting
 its environment's default, and the orchestrator tells you how to change it.
 
 **Does it collect any data?**
-No. It has no servers, no hooks and no scripts. See the [privacy policy](PRIVACY.md).
+No. It has no servers, no hooks and no scripts, and it reads no credentials. When a sign-in is
+handed to your computer, it stays there: only "it worked" comes back, never a token or password. See the [privacy policy](PRIVACY.md).
 
 **Is it free?**
 Yes. Free and open source.

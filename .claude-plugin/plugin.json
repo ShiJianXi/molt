@@ -1,8 +1,8 @@
 {
   "name": "molt",
   "displayName": "Molt",
-  "version": "2.6.1",
-  "description": "Claude Code orchestration skills in a workflow kit that follows how its author works with Claude and where the community is heading. Today: an orchestrator that runs related tasks in parallel sessions, tracks them on a live plan board and keeps a private wiki so it can run for weeks. It also hands browser, sign-in and local-file steps from a claude.ai/code session to your computer. Formerly Cloud Local Bridge.",
+  "version": "2.6.2",
+  "description": "Claude Code orchestration skills in a workflow kit that follows how its author works with Claude and where the community is heading. Today: an orchestrator that runs related tasks in parallel sessions, tracks them on a live plan board and keeps a private wiki so it can run for weeks. It also hands browser, desktop-app and local-file steps from a claude.ai/code session to your computer. Formerly Cloud Local Bridge.",
   "author": {
     "name": "ShiJianXi"
   },
@@ -30,7 +30,6 @@
     "sendmessage",
     "orchestration",
     "browser",
-    "oauth",
     "local-files",
     "parallel-sessions",
     "multi-session",
