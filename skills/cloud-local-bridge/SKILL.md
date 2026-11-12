@@ -122,7 +122,7 @@ received a `<cross-session-message from-session="session_…">` is the **receive
 3. **Send** with `SendMessage` (`to` = that name; add ` [ref]` only if two rows share it). First
    line: one self-contained sentence with the outcome. Send the full report text; `@file` attaches
    nothing on the other side. A sign-in stays on this machine: report that it worked, never the
-   token, password, cookie or code it produced.
+   token, password, API key, cookie or code it produced.
 4. If every route fails, `SendUserFile` the report and give the user the exact cloud title to paste
    it into. Tell the user the send is unconfirmed and where to look: the cloud session on
    claude.ai/code.
