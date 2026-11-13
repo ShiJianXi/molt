@@ -36,7 +36,7 @@ to the orchestrator, never to the user.
   (`auto` is tied to a trusted-device proof the child doesn't get), so always pass
   `permission_mode` = `auto` to `create_session`.
 - A cloud child may start **without the user's claude.ai plugins**. Sessions started from the app
-  get them synced into `~/.claude/plugins/synced/`; a child from `create_session` sometimes gets
+  get them; a child from `create_session` sometimes gets
   only the built-in `cc-plugin-*` ones, and nothing in `create_session` turns syncing on. A skill
   directory linked into `~/.claude/skills/` loads mid-session (it shows up after the next tool
   call), so the brief tells the child to load what's missing that way (step 5, `Plugins`). Only
@@ -92,12 +92,11 @@ to the orchestrator, never to the user.
    isn't `auto`, warn the user that the children can't be started in `auto` (they can't be more
    permissive than this session) and, in `default`, will stall on prompts, before going on.
 4. **Start the children.** Each one gets a new branch, never `main` or a branch another child uses.
-   - Before the first cloud child, list the plugins this session has and each one's repository:
-     `node -e 'for (const f of process.argv.slice(1)) { const j = require(f); console.log(j.name,
-     (j.repository && j.repository.url) || j.repository || "") }'
-     ~/.claude/plugins/synced/*/*/.claude-plugin/plugin.json`. Keep the ones the task uses; that list is the
-     brief's `Plugins` line. A plugin with no `repository` there: ask the user where it lives, or
-     leave it out and say so.
+   - Before the first cloud child, list the plugins this session has: the `<plugin>:` prefixes
+     in your own skill list. Don't read plugin files or anything else in the user's home folder
+     for this. Keep the plugins the task uses; that list is the brief's `Plugins` line. Each one
+     needs its repository (`owner/repo`): use one the user already named, otherwise ask for it in
+     the question below. A plugin whose repository the user doesn't give: leave it out and say so.
      Attaching a plugin's repository with `add_repo` widens what the child can reach, and the
      child's auto-mode check blocks it unless the user approved it: a brief alone isn't the
      user's approval. The same goes for any other repository a child must work in (push to, or
@@ -150,8 +149,9 @@ to the orchestrator, never to the user.
    Already done by the orchestrator: <shared work from step 2, facts found, decisions made>
    Siblings touch: <files or areas other tasks change; stay out of them or say why you can't>
    Plugins (cloud child only): <name> (<owner/repo>), one per plugin from step 4. For each one
-     missing from ~/.claude/plugins/synced/*/, attach <owner/repo> with add_repo (or git clone
-     it if public) and run the block below with p=<name> and r=<the clone's path>. Its skills
+     with no "<name>:" skills in your skill list, attach <owner/repo> with add_repo (or git clone
+     it if public) and run the block below with p=<name> and r=<the clone's path, or
+     the plugin's own folder in it when the block can't find it>. Its skills
      load after your next tool call, without the "<name>:" prefix; where a skill says
      ${CLAUDE_PLUGIN_ROOT}, use the plugin folder the block prints. Never write "not reported"
      or skip a step because a plugin wasn't loaded; if it still can't be, or the block printed
@@ -172,13 +172,12 @@ to the orchestrator, never to the user.
    Paste this block into the brief right after it, when it has a `Plugins` line:
 
    ```sh
-   ls -d ~/.claude/plugins/synced/*/"$p" 2>/dev/null || {
-     f=$(grep -lE "\"name\": *\"$p\"" $(find "$r" -path '*/.claude-plugin/plugin.json' -not -path '*/node_modules/*') | head -1)
-     root=$(dirname "$(dirname "$f")"); echo "$root"; mkdir -p ~/.claude/skills
+   root=$r; [ -d "$root/skills" ] || root=$(find "$r" -type d -path "*/$p/skills" -not -path '*/node_modules/*' | head -1 | sed 's|/skills$||')
+   if [ -z "$root" ]; then echo "skipped $p: no skills folder found; set r to the plugin's own folder"; else
+     echo "$root"; mkdir -p ~/.claude/skills
      for s in "$root"/skills/*/; do d=~/.claude/skills/$(basename "$s")
        if [ -e "$d" ] && [ "$(readlink "$d")" != "${s%/}" ]; then echo "skipped $d: name taken"
-       else ln -sfn "${s%/}" "$d"; fi; done
-   }
+       else ln -sfn "${s%/}" "$d"; fi; done; fi
    ```
 
    Never put a credential (token, password, API key, cookie, sign-in code) in a brief.

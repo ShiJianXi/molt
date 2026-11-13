@@ -102,7 +102,8 @@ git worktree and can use your browser.
   orchestrator lists the plugins it has in each child's brief, and a child that's missing one
   attaches the plugin's repository and links its skills in, so they load mid-session. Only the
   skills come across, not the plugin's hooks or MCP servers. Attaching a plugin's repository needs
-  your yes, so the orchestrator asks once before it starts the children. A plugin step that must happen (say,
+  your yes, so the orchestrator asks once before it starts the children, and asks where a plugin
+  lives if you haven't said. It doesn't read your plugin files to find out. A plugin step that must happen (say,
   a script whose output goes in the PR) goes in the child's "done when", and the orchestrator
   checks it before calling the task done.
 - Each child runs on a model and effort level you can pick per task, e.g. "Sonnet at low for the
