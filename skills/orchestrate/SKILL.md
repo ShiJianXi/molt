@@ -150,7 +150,8 @@ to the orchestrator, never to the user.
    Siblings touch: <files or areas other tasks change; stay out of them or say why you can't>
    Plugins (cloud child only): <name> (<owner/repo>), one per plugin from step 4. For each one
      with no "<name>:" skills in your skill list, attach <owner/repo> with add_repo (or git clone
-     it if public) and run the block below with p=<name> and r=<the clone's path>. Its skills
+     it if public) and run the block below with p=<name> and r=<the clone's path, or
+     the plugin's own folder in it when the block can't find it>. Its skills
      load after your next tool call, without the "<name>:" prefix; where a skill says
      ${CLAUDE_PLUGIN_ROOT}, use the plugin folder the block prints. Never write "not reported"
      or skip a step because a plugin wasn't loaded; if it still can't be, or the block printed
@@ -171,11 +172,12 @@ to the orchestrator, never to the user.
    Paste this block into the brief right after it, when it has a `Plugins` line:
 
    ```sh
-   root=$r; [ -d "$root/skills" ] || root=$(dirname "$(find "$r" -type d -path "*/$p/skills" -not -path '*/node_modules/*' | head -1)")
-   echo "$root"; mkdir -p ~/.claude/skills
-   for s in "$root"/skills/*/; do d=~/.claude/skills/$(basename "$s")
-     if [ -e "$d" ] && [ "$(readlink "$d")" != "${s%/}" ]; then echo "skipped $d: name taken"
-     else ln -sfn "${s%/}" "$d"; fi; done
+   root=$r; [ -d "$root/skills" ] || root=$(find "$r" -type d -path "*/$p/skills" -not -path '*/node_modules/*' | head -1 | sed 's|/skills$||')
+   if [ -z "$root" ]; then echo "skipped $p: no skills folder found; set r to the plugin's own folder"; else
+     echo "$root"; mkdir -p ~/.claude/skills
+     for s in "$root"/skills/*/; do d=~/.claude/skills/$(basename "$s")
+       if [ -e "$d" ] && [ "$(readlink "$d")" != "${s%/}" ]; then echo "skipped $d: name taken"
+       else ln -sfn "${s%/}" "$d"; fi; done; fi
    ```
 
    Never put a credential (token, password, API key, cookie, sign-in code) in a brief.
