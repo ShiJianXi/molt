@@ -39,10 +39,10 @@ jobs:
           for s in artifact-plan cloud-local-bridge orchestrate orchestrator-wiki; do
             [ -f "$tmp/.claude/skills/$s/SKILL.md" ] || { echo "FAIL: $s not linked"; exit 1; }
           done
-          mkdir -p "$tmp/.claude/plugins/synced/x/molt"; rm -rf "$tmp/.claude/skills"
-          HOME="$tmp" p=molt r="$repo" sh "$tmp/block.sh" > /dev/null
-          [ ! -e "$tmp/.claude/skills" ] || { echo "FAIL: linked a plugin that was already synced"; exit 1; }
-          rm -rf "$tmp/.claude/plugins/synced/x/molt"; mkdir -p "$tmp/.claude/skills/orchestrate"
+          rm -rf "$tmp/.claude/skills"; mkdir -p "$tmp/mkt/plugins/molt"; cp -r "$repo/skills" "$tmp/mkt/plugins/molt/skills"
+          HOME="$tmp" p=molt r="$tmp/mkt" sh "$tmp/block.sh" > /dev/null
+          [ -f "$tmp/.claude/skills/orchestrate/SKILL.md" ] || { echo "FAIL: plugin in a subfolder not linked"; exit 1; }
+          rm -rf "$tmp/.claude/skills"; mkdir -p "$tmp/.claude/skills/orchestrate"
           HOME="$tmp" p=molt r="$repo" sh "$tmp/block.sh" | grep -q "skipped.*orchestrate" || { echo "FAIL: overwrote another skill"; exit 1; }
           [ ! -L "$tmp/.claude/skills/orchestrate" ] || { echo "FAIL: replaced another skill"; exit 1; }
           echo "plugin block OK"
